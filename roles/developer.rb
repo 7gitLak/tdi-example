@@ -2,7 +2,8 @@ name "developer"
 description "for developer machine"
 run_list(
 	"recipe[irc]",
-	"recipe[chruby::system]"
+	"recipe[chruby::system]",
+	"recipe[virtualbox]"
 )
 
 
