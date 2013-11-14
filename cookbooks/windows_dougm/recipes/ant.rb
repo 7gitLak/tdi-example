@@ -1,7 +1,7 @@
 #
 # Author:: Doug MacEachern <dougm@vmware.com>
 # Cookbook Name:: windows
-# Recipe:: ivy
+# Recipe:: ant
 #
 # Copyright 2010, VMware, Inc.
 #
@@ -18,38 +18,47 @@
 # limitations under the License.
 #
 
-directory node[:ivy][:dir] do
+directory node[:ant][:dir] do
   action :create
   recursive true
 end
 
-ivy_file_name = "ivy-#{node[:ivy][:release]}"
-dir = "apache-#{ivy_file_name}"
+dir = "apache-ant-#{node[:ant][:release]}"
 zip = "#{dir}-bin.zip"
-dst = "#{node[:ivy][:dir]}/#{zip}"
-home = "#{node[:ivy][:dir]}/#{dir}"
+dst = "#{node[:ant][:dir]}\\#{zip}"
+home = "#{node[:ant][:dir]}\\#{dir}"
+junit = "#{home}\\lib\\#{File.basename(node[:ant][:junit_jar])}"
 
 remote_file dst do
-  source "#{node[:ivy][:mirror]}/#{zip}"
+  source "#{node[:ant][:mirror]}/#{zip}"
   not_if { File.exists?(dst) }
 end
 
-ivy_jar_file = "#{ivy_file_name}.jar"
-ivy_jar = "#{node[:ivy][:dir]}/#{dir}/#{ivy_jar_file}"
 
-windows_zipfile node[:ivy][:dir] do
+windows_zipfile node[:ant][:dir] do
   source dst
   action :unzip
-  not_if { File.exists?("#{ivy_jar}") }
+  not_if { File.exists?("#{node[:ant][:dir]}\\#{dir}\\bin\\ant.bat") }
 end
 
-ant_dir = "#{ENV['ANT_HOME']}"
-ant_lib_dr = "#{ant_dir}/lib"
-ivy_jar_target = "#{ant_lib_dr}/#{ivy_jar_file}"
+#windows_unzip dst do
+#  force true
+#  path node[:ant][:dir]
+#  not_if { File.exists?("#{node[:ant][:dir]}\\#{dir}\\bin\\ant.bat") }
+#end
 
-remote_file ivy_jar_target do
-  source "file://#{ivy_jar}"
-  not_if { File.exists?(ivy_jar_target) }
+#remote_file junit do
+#  source node[:ant][:junit_jar]
+#  not_if { File.exists?(junit) }
+#end
+
+env "ANT_HOME" do
+  value home
 end
 
-#copy ivy.jar nach ant_lib_dr
+env "PATH" do
+  action :modify
+  delim File::PATH_SEPARATOR
+  value '%ANT_HOME%\bin'
+end
+

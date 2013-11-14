@@ -6,3 +6,5 @@
 #
 # All rights reserved - Do Not Redistribute
 #
+include_recipe "windows_dougm::ant"
+include_recipe "jenkins_dg::ivy"

@@ -1,9 +1,9 @@
 #
 # Author:: Doug MacEachern <dougm@vmware.com>
 # Cookbook Name:: windows
-# Recipe:: ivy
+# Recipe:: maven
 #
-# Copyright 2010, VMware, Inc.
+# Copyright 2011, VMware, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,38 +18,37 @@
 # limitations under the License.
 #
 
-directory node[:ivy][:dir] do
+directory node[:maven][:dir] do
   action :create
   recursive true
 end
 
-ivy_file_name = "ivy-#{node[:ivy][:release]}"
-dir = "apache-#{ivy_file_name}"
+dir = "apache-maven-#{node[:maven][:release]}"
 zip = "#{dir}-bin.zip"
-dst = "#{node[:ivy][:dir]}/#{zip}"
-home = "#{node[:ivy][:dir]}/#{dir}"
+dst = "#{node[:maven][:dir]}\\#{zip}"
+home = "#{node[:maven][:dir]}\\#{dir}"
 
 remote_file dst do
-  source "#{node[:ivy][:mirror]}/#{zip}"
+  source "#{node[:maven][:mirror]}/#{zip}"
   not_if { File.exists?(dst) }
 end
 
-ivy_jar_file = "#{ivy_file_name}.jar"
-ivy_jar = "#{node[:ivy][:dir]}/#{dir}/#{ivy_jar_file}"
-
-windows_zipfile node[:ivy][:dir] do
-  source dst
-  action :unzip
-  not_if { File.exists?("#{ivy_jar}") }
+#XXX rubyzip fails to unzip apache-maven-2.2.1-bin.zip
+#so fuckit, use jar to extract for now.
+#windows_unzip dst do
+#  force true
+#  path node[:maven][:dir]
+execute "jar -xf #{dst}" do
+  cwd node[:maven][:dir]
+  not_if { File.exists?("#{node[:maven][:dir]}\\#{dir}\\bin\\mvn.bat") }
 end
 
-ant_dir = "#{ENV['ANT_HOME']}"
-ant_lib_dr = "#{ant_dir}/lib"
-ivy_jar_target = "#{ant_lib_dr}/#{ivy_jar_file}"
-
-remote_file ivy_jar_target do
-  source "file://#{ivy_jar}"
-  not_if { File.exists?(ivy_jar_target) }
+env "M2_HOME" do
+  value home
 end
 
-#copy ivy.jar nach ant_lib_dr
+env "PATH" do
+  action :modify
+  delim File::PATH_SEPARATOR
+  value '%M2_HOME%\bin'
+end

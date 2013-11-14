@@ -1,7 +1,7 @@
 #
 # Author:: Doug MacEachern <dougm@vmware.com>
 # Cookbook Name:: windows
-# Recipe:: ivy
+# Recipe:: cmake
 #
 # Copyright 2010, VMware, Inc.
 #
@@ -18,38 +18,27 @@
 # limitations under the License.
 #
 
-directory node[:ivy][:dir] do
+pth = "v#{node[:cmake][:version]}/cmake-#{node[:cmake][:release]}-win32-x86.exe"
+exe = File.basename(pth)
+dst = "#{node[:cmake][:dir]}\\#{exe}"
+bin = "#{node[:cmake][:dir]}\\bin"
+
+directory node[:cmake][:dir] do
   action :create
-  recursive true
 end
 
-ivy_file_name = "ivy-#{node[:ivy][:release]}"
-dir = "apache-#{ivy_file_name}"
-zip = "#{dir}-bin.zip"
-dst = "#{node[:ivy][:dir]}/#{zip}"
-home = "#{node[:ivy][:dir]}/#{dir}"
-
 remote_file dst do
-  source "#{node[:ivy][:mirror]}/#{zip}"
+  source "#{node[:cmake][:mirror]}/#{pth}"
   not_if { File.exists?(dst) }
 end
 
-ivy_jar_file = "#{ivy_file_name}.jar"
-ivy_jar = "#{node[:ivy][:dir]}/#{dir}/#{ivy_jar_file}"
-
-windows_zipfile node[:ivy][:dir] do
-  source dst
-  action :unzip
-  not_if { File.exists?("#{ivy_jar}") }
+execute "install #{exe}" do
+  command "#{dst} /S /NCRC /D=#{node[:cmake][:dir]}"
+  not_if { File.exists?("#{bin}\\cmake.exe") }
 end
 
-ant_dir = "#{ENV['ANT_HOME']}"
-ant_lib_dr = "#{ant_dir}/lib"
-ivy_jar_target = "#{ant_lib_dr}/#{ivy_jar_file}"
-
-remote_file ivy_jar_target do
-  source "file://#{ivy_jar}"
-  not_if { File.exists?(ivy_jar_target) }
+env "PATH" do
+  action :modify
+  delim File::PATH_SEPARATOR
+  value bin
 end
-
-#copy ivy.jar nach ant_lib_dr
