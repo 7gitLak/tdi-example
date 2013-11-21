@@ -35,23 +35,6 @@ remote_file dst do
 end
 
 
-windows_zipfile node[:ant][:dir] do
-  source dst
-  action :unzip
-  not_if { File.exists?("#{node[:ant][:dir]}\\#{dir}\\bin\\ant.bat") }
-end
-
-#windows_unzip dst do
-#  force true
-#  path node[:ant][:dir]
-#  not_if { File.exists?("#{node[:ant][:dir]}\\#{dir}\\bin\\ant.bat") }
-#end
-
-#remote_file junit do
-#  source node[:ant][:junit_jar]
-#  not_if { File.exists?(junit) }
-#end
-
 env "ANT_HOME" do
   value home
 end
@@ -62,3 +45,15 @@ env "PATH" do
   value '%ANT_HOME%\bin'
 end
 
+
+windows_reboot 60 do
+  reason 'reboot after ant set env'
+  action :nothing
+end
+
+windows_zipfile node[:ant][:dir] do
+  source dst
+  action :unzip
+  not_if { File.exists?("#{node[:ant][:dir]}\\#{dir}\\bin\\ant.bat") }
+  notifies :request, 'windows_reboot[60]'
+end
