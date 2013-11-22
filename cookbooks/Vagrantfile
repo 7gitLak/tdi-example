@@ -96,8 +96,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #   chef.cookbooks_path = "../my-recipes/cookbooks"
   #   chef.roles_path = "../my-recipes/roles"
   #   chef.data_bags_path = "../my-recipes/data_bags"
-  chef.add_recipe "windows"
-  chef.add_recipe "java"
   chef.add_recipe "jenkins_dg"
   #   chef.add_role "web"
   #
