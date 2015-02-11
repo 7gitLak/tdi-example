@@ -22,6 +22,8 @@ Bundle 'oplatek/Conque-Shell'
 " Various editing plugins
 Bundle 'kana/vim-textobj-user'
 Bundle 'tpope/vim-repeat'
+Bundle 'tpope/vim-surround'
+Bundle 'nelstrom/vim-qargs' 
 
 " Comment plugin
 Bundle 'tpope/vim-commentary'
@@ -265,6 +267,8 @@ nnoremap <leader>v V`]
 nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
 inoremap jj <ESC>
 nnoremap <leader><space> :noh<cr>
+nnoremap <leader>d :e %:h<cr>
+nnoremap <leader>t :ConqueTerm cmd<cr>
 map <leader>ru :SyntasticCheck rubocop<CR>
 
 " ----------------------------------------------------------------------------
@@ -344,3 +348,6 @@ autocmd BufReadPost *
 " ----------------------------------------------------------------------------
 " Allow overriding these settings
 " ----------------------------------------------------------------------------
+
+"for Syntastic
+let g:syntastic_chef_foodcritic_args = "-t ~FC001 -X spec"
