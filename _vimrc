@@ -33,6 +33,9 @@ Bundle 'altercation/vim-colors-solarized'
 Bundle 'endel/vim-github-colorscheme'
 Bundle 'vim-scripts/confluencewiki.vim'
 
+" gradle plugins
+Bundle 'tfnico/vim-gradle'
+
 " Ruby plugins
 Bundle 'nelstrom/vim-textobj-rubyblock'
 Bundle 'thoughtbot/vim-rspec'
@@ -49,11 +52,15 @@ Bundle 'jcrocholl/pep8'
 " File system plugins
 Bundle 'scrooloose/nerdtree'
 
+" Powershell plugins
+Bundle 'PProvost/vim-ps1'
+
 " Chef plugins
 Bundle 'dougireton/vim-chef'
 
 " Markdown plugins
 Bundle 'tpope/vim-markdown'
+Bundle 'chikamichi/mediawiki.vim'
 
 " Wiki
 Bundle 'vimwiki'
@@ -261,6 +268,8 @@ nnoremap k gk
 nnoremap gj j
 nnoremap gk k
 " au FocusLost * :wa
+nnoremap <leader>j ]s
+nnoremap <leader>k [s
 nnoremap <leader>w <C-w>v<C-w>l
 nnoremap <leader>c <C-w>c
 nnoremap <leader>v V`]
